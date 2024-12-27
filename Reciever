@@ -1,0 +1,265 @@
+#include <LiquidCrystal.h>
+ const int rs =13, en = 12, d4 =14, d5 = 27, d6 = 26, d7 = 25;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+
+
+int IN1=33;
+int IN2=32;
+int IN3=21;
+int IN4=22;
+
+int IN5=2;
+int IN6=4;
+int IN7=5;
+int IN8=23;
+
+#define trigPin 18
+#define echoPin 19
+
+long duration;
+int distance;
+
+
+char buff;
+
+
+void setup() 
+{
+    pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  pinMode(IN1,OUTPUT);
+  pinMode(IN2,OUTPUT);
+  pinMode(IN3,OUTPUT);
+  pinMode(IN4,OUTPUT);
+
+  pinMode(IN5,OUTPUT);
+  pinMode(IN6,OUTPUT);
+  pinMode(IN7,OUTPUT);
+  pinMode(IN8,OUTPUT);
+
+  digitalWrite(IN1,LOW);
+  digitalWrite(IN2,LOW);
+  digitalWrite(IN3,LOW);
+  digitalWrite(IN4,LOW);
+
+  digitalWrite(IN5,LOW);
+  digitalWrite(IN6,LOW);
+  digitalWrite(IN7,LOW);
+  digitalWrite(IN8,LOW);
+
+  
+  Serial.begin(9600);
+Serial2.begin(9600);
+  lcd.begin(16,2);
+  lcd.clear();
+  lcd.print("Gesture Control");
+  lcd.setCursor(0,1);
+  lcd.print("   Robot..");
+  delay(1000);
+
+}
+
+
+
+void loop() 
+{
+    if(Serial2.available()>0)
+    {
+      String buff=Serial2.readString();
+      Serial.println(buff);
+    delay(1000);
+    if(buff[0]=='$')
+    {
+      if(buff[1]=='F')
+      {
+        FORWARD();
+      }
+      if(buff[1]=='B')
+      {
+        REVERSE();
+      }
+      if(buff[1]=='L')
+      {
+        LEFT();
+      }
+      if(buff[1]=='R')
+      {
+        RIGHT();
+      }
+      if(buff[1]=='S')
+      {
+        STOP();
+      }
+      if(buff[1]=='U')
+      {
+        UP();
+      }
+      if(buff[1]=='D')
+      {
+        DOWN();
+      }
+      if(buff[1]=='O')
+      {
+        OPEN();
+      }
+      if(buff[1]=='C')
+      {
+        CLOSE();
+      }
+     
+    }
+    }
+  //  Distance();
+}  
+void Distance()
+{
+  // ########################## Ultrasonic  ###########################//
+      digitalWrite(trigPin, LOW);
+  delayMicroseconds(5);
+
+  // Trigger the sensor by setting the trigPin high for 10 microseconds:
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Read the echoPin, pulseIn() returns the duration (length of the pulse) in microseconds:
+  duration = pulseIn(echoPin, HIGH);
+  // Calculate the distance:
+  distance = duration * 0.034 / 2;
+
+  // Print the distance on the Serial Monitor (Ctrl+Shift+M):
+  Serial.print("Distance = ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  delay(500);
+  if(distance<50)
+  {
+    lcd.clear();
+    lcd.print("Object Detected");
+    Serial.println("Object Detected");
+
+    STOP();
+    delay(2000);
+  
+ 
+  }
+  
+} 
+void FORWARD()
+{
+  lcd.clear();
+  lcd.print("Forward...");
+  Serial.println("Forward...");
+  digitalWrite(IN1,HIGH);
+  digitalWrite(IN2,LOW);
+  digitalWrite(IN3,HIGH);
+  digitalWrite(IN4,LOW);
+} 
+void REVERSE()
+{
+  lcd.clear();
+  lcd.print("Reverse...");
+  Serial.println("Reverse...");
+  digitalWrite(IN1,LOW);
+  digitalWrite(IN2,HIGH);
+  digitalWrite(IN3,LOW);
+  digitalWrite(IN4,HIGH);
+} 
+void LEFT()
+{
+   lcd.clear();
+  lcd.print("Left...");
+  Serial.println("Left...");
+
+    digitalWrite(IN1,HIGH);
+  digitalWrite(IN2,LOW);
+  digitalWrite(IN3,LOW);
+  digitalWrite(IN4,HIGH); 
+
+
+ 
+} 
+void RIGHT()
+{
+   lcd.clear();
+  lcd.print("Right...");
+  Serial.println("Right...");
+  
+   digitalWrite(IN1,LOW);
+  digitalWrite(IN2,HIGH);
+  digitalWrite(IN3,HIGH);
+  digitalWrite(IN4,LOW);
+ 
+} 
+void STOP()
+{
+  lcd.clear();
+  lcd.print("Stop...");
+  Serial.println("Stop...");
+  digitalWrite(IN1,LOW);
+  digitalWrite(IN2,LOW);
+  digitalWrite(IN3,LOW);
+  digitalWrite(IN4,LOW);
+} 
+
+void UP()
+{
+   lcd.clear();
+  lcd.print("Up...");
+  Serial.println("Up...");
+  digitalWrite(IN5,HIGH);
+  digitalWrite(IN6,LOW);
+  delay(2000);
+  UP_DOWN_STOP();
+  
+}
+void DOWN()
+{
+  lcd.clear();
+  lcd.print("Down...");
+  Serial.println("Down...");
+  digitalWrite(IN5,LOW);
+  digitalWrite(IN6,HIGH);
+  delay(2000);
+  UP_DOWN_STOP();
+  
+}
+void UP_DOWN_STOP()
+{
+  Serial.println("Up Down Stop...");
+  digitalWrite(IN5,LOW);
+  digitalWrite(IN6,LOW);
+  
+}
+void OPEN()
+{
+  lcd.clear();
+  lcd.print("Open...");
+  Serial.println("Open...");
+  digitalWrite(IN7,LOW);
+  digitalWrite(IN8,HIGH);
+  delay(2000);
+  OPEN_CLOSE_STOP();
+  
+}
+void CLOSE()
+{
+  lcd.clear();
+  lcd.print("Close...");
+  Serial.println("Close...");
+  digitalWrite(IN7,HIGH);
+  digitalWrite(IN8,LOW);
+  delay(2000);
+  OPEN_CLOSE_STOP();
+  
+}
+void OPEN_CLOSE_STOP()
+{
+  Serial.println("Open Close Stop...");
+  digitalWrite(IN7,LOW);
+  digitalWrite(IN8,LOW);
+  
+}
