@@ -1,0 +1,190 @@
+#include <LiquidCrystal.h>
+ const int rs =13, en = 12, d4 =14, d5 = 27, d6 = 26, d7 = 25;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+
+#include <Wire.h>
+
+#include <Adafruit_Sensor.h> 
+
+#include <Adafruit_ADXL345_U.h>
+
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified();
+
+
+
+
+
+
+
+
+void setup()
+{
+  
+  
+    Serial.begin(9600);
+     Serial2.begin(9600);
+    lcd.begin(16, 2);
+   
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Gesture Tx");
+    lcd.setCursor(0,1);
+    lcd.print(" Module    ");
+    
+    delay(1000);
+ 
+    
+   
+   if(!accel.begin())
+
+   {
+
+      Serial.println("No valid sensor found");
+
+      while(1);
+
+   }
+   
+
+ 
+}
+void loop()
+{
+   
+    Gesture_Check();
+  
+}
+
+
+void Gesture_Check()
+{
+
+  while(1)
+  {
+  
+    int F1_val=analogRead(36);
+    int F2_val=analogRead(39);
+    int F3_val=analogRead(34);
+    int F4_val=analogRead(35);
+
+    sensors_event_t event; 
+
+   accel.getEvent(&event);
+
+  int X_val=event.acceleration.x;
+  int Y_val=event.acceleration.y;
+  
+    lcd.clear();
+    lcd.print("X:");
+    lcd.print(X_val);
+    lcd.setCursor(0, 1);
+    lcd.print("Y:");
+    lcd.print(Y_val);
+    delay(500);
+
+    Serial.print("F1:");
+    Serial.println(F1_val);
+//    
+    Serial.print("F2:");
+    Serial.println(F2_val);
+   
+    Serial.print("F3:");
+    Serial.println(F3_val);
+
+    Serial.print("F4:");
+    Serial.println(F4_val);
+
+
+ 
+    delay(1000);
+    if((F1_val<800)&&(F2_val>3000)&&(F3_val>3000)&&(F4_val>3000))
+    {
+      Serial.println("Down");
+     // Serial1.println("Hello");
+      lcd.clear();
+      lcd.print("Down");
+      Serial2.println("$D");
+      delay(100); 
+
+      
+    }
+    if((F2_val<800)&&(F1_val>3000)&&(F3_val>3000)&&(F4_val>3000))
+    {
+      Serial.println("UP");
+     // Serial1.println("Hello");
+      lcd.clear();
+      lcd.print("UP");
+      Serial2.println("$U");
+      delay(100); 
+
+      
+    }
+    if((F3_val<800)&&(F1_val>3000)&&(F2_val>3000)&&(F4_val>3000))
+    {
+      Serial.println("OPEN");
+     // Serial1.println("Hello");
+      lcd.clear();
+      lcd.print("OPEN");
+      Serial2.println("$O");
+      delay(100); 
+
+      
+    }
+    if((F4_val<800)&&(F1_val>3000)&&(F2_val>3000)&&(F3_val>3000))
+    {
+      Serial.println("CLOSE");
+     // Serial1.println("Hello");
+      lcd.clear();
+      lcd.print("CLOSE");
+      Serial2.println("$C");
+      delay(100); 
+    }
+      
+   
+    if((X_val<-7))
+    {
+      Serial.println("Forward");
+      lcd.clear();
+      lcd.print("Forward");
+      Serial2.println("$F");
+      delay(1000);
+   }
+   if((X_val>7))
+    {
+      Serial.println("Reverse");
+      lcd.clear();
+      lcd.print("Reverse");
+      Serial2.println("$B");
+      delay(100);
+   }
+   if((Y_val<-7))
+    {
+      Serial.println("Left");
+      lcd.clear();
+      lcd.print("Left");
+      Serial2.println("$L");
+      delay(100);
+   }
+   if((Y_val>7))
+    {
+      Serial.println("Right");
+      lcd.clear();
+      lcd.print("Right");
+      Serial2.println("$R");
+      delay(100);
+   }
+
+    if((X_val>=0)&&(X_val<=2))
+    {
+      Serial.println("Stop");
+      lcd.clear();
+      lcd.print("Stop");
+      Serial2.println("$S");
+      delay(100);
+    }
+    
+  
+}
+
+}
